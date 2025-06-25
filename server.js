@@ -32,7 +32,9 @@ app.post('/genereteLetter', (req, res) => {
 })
 
 
+const name = process.env.NAME
+
 app.listen(port, () => {
-    console.log("Server started " + port);
+    console.log("Server started " + port + "It's name here" + name);
 
 });
