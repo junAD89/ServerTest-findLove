@@ -50,7 +50,7 @@ app.get('/', (req, res) => {
 
 
 // Generate letter endpoint
-app.post('/generateLetter', async (req, res) => {
+app.post('/generateLetterForTester', async (req, res) => {
     try {
         // Input validation
         const { LetterRecipientName, LetterOccasion, LetterTone, LetterStyle } = req.body;
