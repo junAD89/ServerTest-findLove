@@ -3,6 +3,11 @@ import { Mistral } from '@mistralai/mistralai';
 import axios from "axios";
 import 'dotenv/config';
 
+///import of cors
+import cors from "cors";
+
+
+
 // Environment variables setup
 const apiKey = process.env.MISTRAL_API_KEY;
 const port = process.env.PORT || 3500;
@@ -22,6 +27,9 @@ const mistral = new Mistral({
 const app = express();
 app.use(express.json());
 
+app.use(cors());
+// using cors to allow cross-origin requests
+
 // JSON validation middleware
 app.use((err, req, res, next) => {
     if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
@@ -37,6 +45,7 @@ app.get('/', (req, res) => {
         status: 'Online',
         endpoints: ['/chatWithAi', '/generateLetter']
     });
+
 });
 
 
