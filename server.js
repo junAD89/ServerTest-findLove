@@ -40,66 +40,6 @@ app.get('/', (req, res) => {
     });
 });
 
-// Chat with AI endpoint
-app.post('/chatWithAi', async (req, res) => {
-    try {
-        // Input validation
-        const { messages } = req.body;
-
-        // to check if messages is not empty
-        if (!messages || !Array.isArray(messages) || messages.length === 0) {
-            return res.status(400).json({
-                error: 'Messages field is required and must be a non-empty array'
-            });
-        }
-
-        // Message format validation
-        const isValidMessages = messages.every(msg =>
-            msg && typeof msg === 'object' &&
-            typeof msg.content === 'string' &&
-            typeof msg.role === 'string'
-        );
-
-        if (!isValidMessages) {
-            return res.status(400).json({
-                error: 'Invalid message format. Each message must have "content" and "role"'
-            });
-        }
-
-        console.log('📨 Sending request to Mistral AI...');
-
-        const result = await mistral.chat.complete({
-            model: "mistral-small-latest",
-            messages: messages,
-        });
-
-        if (result.choices && result.choices.length > 0) {
-            const message = result.choices[0].message.content;
-            console.log('✅ Response received from Mistral AI');
-
-            res.json({
-                success: true,
-                message: "Chat with AI successful",
-                data: message,
-                timestamp: new Date().toISOString()
-            });
-        } else {
-            console.error('❌ No response found from Mistral AI');
-            res.status(500).json({
-                error: "No response found from Mistral AI",
-                success: false
-            });
-        }
-
-    } catch (error) {
-        console.error('❌ Error in /chatWithAi:', error.message);
-        res.status(500).json({
-            error: 'Internal server error',
-            success: false,
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-    }
-});
 
 // Generate letter endpoint
 app.post('/generateLetter', async (req, res) => {
@@ -168,6 +108,85 @@ app.post('/generateLetter', async (req, res) => {
         });
     }
 });
+
+
+
+
+
+// Chat with AI endpoint
+app.post('/chatWithAi', async (req, res) => {
+    try {
+        // Input validation
+        const { messages } = req.body;
+
+        // to check if messages is not empty
+        if (!messages || !Array.isArray(messages) || messages.length === 0) {
+            return res.status(400).json({
+                error: 'Messages field is required and must be a non-empty array'
+            });
+        }
+
+        // Message format validation
+        // to check data validity
+        const isValidMessages = messages.every(msg =>
+            msg && typeof msg === 'object' &&
+            // check msg is object
+            typeof msg.content === 'string' &&
+            // check content is string
+            typeof msg.role === 'string'
+            // check role is string
+            // it s use to avoid bad injection
+        );
+
+        if (!isValidMessages) {
+            return res.status(400).json({
+                error: 'Invalid message format. Each message must have "content" and "role"'
+            });
+        }
+
+        console.log('📨 Sending request to Mistral AI...');
+
+
+        // Call Mistral AI chat completion
+        const result = await mistral.chat.complete({
+            model: "mistral-small-latest",
+            messages: messages,
+        });
+
+        // Check if result contains choices
+        if (result.choices && result.choices.length > 0) {
+            const message = result.choices[0].message.content;
+            console.log('✅ Response received from Mistral AI');
+
+            res.json({
+                success: true,
+                message: "Chat with AI successful",
+                data: message,
+                timestamp: new Date().toISOString()
+            });
+        }
+        // If no choices are found, return an error
+        else {
+            console.error('❌ No response found from Mistral AI');
+            res.status(500).json({
+                error: "No response found from Mistral AI",
+                success: false
+            });
+        }
+
+    }
+    // Handle specific axios errors
+    catch (error) {
+        console.error('❌ Error in /chatWithAi:', error.message);
+        res.status(500).json({
+            error: 'Internal server error',
+            success: false,
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+});
+
+
 
 // 404 handler
 app.use((req, res) => {
