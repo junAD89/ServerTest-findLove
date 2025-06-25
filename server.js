@@ -6,7 +6,6 @@ import 'dotenv/config';
 // Environment variables setup
 const apiKey = process.env.MISTRAL_API_KEY;
 const port = process.env.PORT || 3500;
-const name = process.env.NAME || 'My API';
 
 // Check if API key exists
 if (!apiKey) {
@@ -209,6 +208,5 @@ app.use((error, req, res, next) => {
 // Start server
 app.listen(port, () => {
     console.log(`🚀 Server started on port ${port}`);
-    console.log(`📝 Server name: ${name}`);
     console.log(`🔗 Available at: http://localhost:${port}`);
 });
